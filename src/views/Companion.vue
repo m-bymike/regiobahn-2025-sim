@@ -174,8 +174,8 @@ import {
   Switch,
   Track,
   TrackType,
-  Train
-} from "@/railway";
+  Train, TrainWithCompanion,
+} from '@/railway'
 import { Component, Vue } from "vue-property-decorator";
 // import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 
@@ -185,7 +185,7 @@ import { Component, Vue } from "vue-property-decorator";
 export default class Home extends Vue {
   trackType = TrackType;
   track: Track = null;
-  trains = [] as Train[];
+  trains = [] as TrainWithCompanion[];
   currentSpeed = 4;
   error: string = null;
   interval = null;
@@ -233,7 +233,7 @@ export default class Home extends Vue {
 
   startTrain(el: Siding): void {
     if (el.isOccupied) return;
-    const train = new Train();
+    const train = new TrainWithCompanion();
     train.setPosition(el);
     if (el.prev()) {
       train.changeDir();
@@ -259,7 +259,7 @@ export default class Home extends Vue {
     rows[1][3] = rows[1][2].append(new Straight());
 
     rows[0][4] = null;
-    rows[1][4] = rows[1][3].append(new StraightWithSignal());
+    rows[1][4] = rows[1][3].append(new Straight());
 
     rows[0][5] = null;
     rows[1][5] = rows[1][4].append(Switch.forwardNorth());
@@ -282,7 +282,7 @@ export default class Home extends Vue {
     rows[1][10].junction(rows[0][9]);
 
     rows[0][11] = null;
-    rows[1][11] = rows[1][10].append(new StraightWithSignal(true));
+    rows[1][11] = rows[1][10].append(new Straight());
 
     rows[0][12] = null;
     rows[1][12] = rows[1][11].append(new Straight());
