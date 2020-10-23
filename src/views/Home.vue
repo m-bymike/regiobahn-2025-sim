@@ -29,12 +29,12 @@
               class="track Siding"
               :class="{ 'is-occupied': col.isOccupied }"
             >
-              <svg width="21px" height="6px" viewBox="-0.5 -0.5 21 6">
+              <svg width="6px" height="6px" viewBox="-0.5 -0.5 6 6">
                 <g>
                   <rect
                     x="0"
                     y="0"
-                    width="20"
+                    width="5"
                     height="5"
                     rx="0.75"
                     ry="0.75"
@@ -246,55 +246,101 @@ export default class Home extends Vue {
     const rows = [[], []];
     const trackBegin = new Siding();
 
-    rows[0][0] = null;
-    rows[1][0] = trackBegin;
+    let col = 0;
 
-    rows[0][1] = null;
-    rows[1][1] = trackBegin.append(new Straight());
+    rows[0][col] = null;
+    rows[1][col] = trackBegin;
 
-    rows[0][2] = null;
-    rows[1][2] = rows[1][1].append(new Straight());
+    rows[0][++col] = null;
+    rows[1][col] = trackBegin.append(new Straight());
 
-    rows[0][3] = null;
-    rows[1][3] = rows[1][2].append(new Straight());
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new Straight());
 
-    rows[0][4] = null;
-    rows[1][4] = rows[1][3].append(new StraightWithSignal());
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new Straight());
 
-    rows[0][5] = null;
-    rows[1][5] = rows[1][4].append(Switch.forwardNorth());
-    rows[1][5].switch();
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal());
 
-    rows[0][6] = rows[1][5].junction(new StraightWithSignal(true));
-    rows[1][6] = rows[1][5].append(new StraightWithSignal(true));
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(Switch.forwardNorth());
+    rows[1][col].switch();
 
-    rows[0][7] = rows[0][6].append(new Straight());
-    rows[1][7] = rows[1][6].append(new Straight());
+    rows[0][++col] = rows[1][col - 1].junction(new StraightWithSignal(true));
+    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
 
-    rows[0][8] = rows[0][7].append(new Straight());
-    rows[1][8] = rows[1][7].append(new Straight());
+    rows[0][++col] = rows[0][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1].append(new Straight());
 
-    rows[0][9] = rows[0][8].append(new StraightWithSignal());
-    rows[1][9] = rows[1][8].append(new StraightWithSignal());
+    rows[0][++col] = rows[0][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1].append(new Straight());
 
-    rows[0][10] = null;
-    rows[1][10] = rows[1][9].append(Switch.reverseNorth());
-    rows[1][10].junction(rows[0][9]);
+    rows[0][++col] = rows[0][col - 1].append(new StraightWithSignal());
+    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal());
 
-    rows[0][11] = null;
-    rows[1][11] = rows[1][10].append(new StraightWithSignal(true));
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(Switch.reverseNorth());
+    rows[1][col].junction(rows[0][col - 1]);
 
-    rows[0][12] = null;
-    rows[1][12] = rows[1][11].append(new Straight());
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
 
-    rows[0][13] = null;
-    rows[1][13] = rows[1][12].append(new Straight());
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new Straight());
 
-    rows[0][14] = null;
-    rows[1][14] = rows[1][13].append(new Straight());
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new Straight());
 
-    rows[0][15] = null;
-    rows[1][15] = rows[1][14].append(new Siding());
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(Switch.forwardNorth());
+
+    rows[0][++col] = rows[1][col - 1].junction(new StraightWithSignal(true));
+    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
+
+    rows[0][++col] = rows[0][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1].append(new Straight());
+
+    rows[0][++col] = rows[0][col - 1].append(new Siding());
+    rows[1][col] = rows[1][col - 1].append(new Straight());
+
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal());
+
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(Switch.forwardNorth());
+    rows[1][col].switch();
+
+    rows[0][++col] = rows[1][col - 1].junction(new StraightWithSignal(true));
+    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
+
+    rows[0][++col] = rows[0][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1].append(new Straight());
+
+    rows[0][++col] = rows[0][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1].append(new Straight());
+
+    rows[0][++col] = rows[0][col - 1].append(new StraightWithSignal());
+    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal());
+
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(Switch.reverseNorth());
+    rows[1][col].junction(rows[0][col - 1]);
+
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
+
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new Straight());
+
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new Straight());
+
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new Straight());
+
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1].append(new Siding());
 
     this.rows = rows;
   }

@@ -167,6 +167,12 @@ export class StraightWithSignal extends Straight {
   public change(): void {
     this._stop = !this._stop
   }
+
+  freeUp() {
+    super.freeUp();
+    this._stop = true;
+  }
+
   private _stop = true;
   constructor(
     public readonly reverse = false,
