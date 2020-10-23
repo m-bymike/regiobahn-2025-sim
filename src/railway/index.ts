@@ -5,9 +5,21 @@ export enum TrackType {
   Switch = "Switch"
 }
 
-export class Crash extends Error {
+export class RailWayError extends Error {
   constructor(public readonly message: string) {
     super();
+  }
+}
+
+export class Crash extends RailWayError {
+  constructor() {
+    super("Zusammenstoß");
+  }
+}
+
+export class SwitchNotReady extends RailWayError {
+  constructor() {
+    super("Weiche von der falschen Seite befahren");
   }
 }
 
@@ -17,7 +29,7 @@ export class Train {
 
   public setPosition(pos: TrackElement) {
     this.pos = pos;
-    pos.occupy(this);
+    pos.occupy(this, null);
   }
 
   public move() {
@@ -29,16 +41,28 @@ export class Train {
       return;
     }
 
-    // TODO check switch direction
     if (!this.canMove()) return;
 
-    this.pos.freeUp();
+    this.assertSecure();
+
+    this.prepareMove();
+
+    const prev = this.pos;
+    prev.freeUp();
     this.pos = this.forward ? this.pos.next() : this.pos.prev();
-    this.pos && this.pos.occupy(this);
+    this.pos && this.pos.occupy(this, prev);
+  }
+
+  protected assertSecure(): void {
+    // void
   }
 
   protected canMove(): boolean {
     return true;
+  }
+
+  protected prepareMove(): void {
+    // void
   }
 
   public changeDir() {
@@ -53,6 +77,19 @@ export class TrainWithCompanion extends Train{
       this.pos?.next()?.next() : this.pos?.prev()?.prev();
 
     return !el || !el.isOccupied;
+  }
+
+  protected prepareMove() {
+    super.prepareMove()
+    const next = this.forward ? this.pos?.next() : this.pos?.prev();
+    if (!next) return;
+    if (!this.pos) return;
+
+    if (next.type() !== TrackType.Switch) return;
+    if (next.isOccupied) return;
+    if (!(next as Switch).isReady(this.pos)) {
+      (next as Switch).switch();
+    }
   }
 }
 
@@ -71,9 +108,9 @@ abstract class TrackElement {
     return this.occupiedBy !== null;
   }
 
-  public occupy(train: Train): void {
+  public occupy(train: Train, from: TrackElement | null): void {
     if (this.isOccupied) {
-      throw new Crash("Zusammenstoss!");
+      throw new Crash();
     }
     this.occupiedBy = train;
   }
@@ -180,6 +217,25 @@ export class Switch extends TrackElement {
 
   public switch(): void {
     this._dirStraight = !this._dirStraight;
+  }
+
+  occupy(train: Train, from: TrackElement | null) {
+    if (from && !this.isReady(from)) {
+      throw new SwitchNotReady();
+    }
+
+    super.occupy(train, from)
+  }
+
+  public isReady(from: TrackElement): boolean {
+    if (this._dirStraight) {
+      return this.next() === from || this.prev() === from;
+    }
+
+    if (this._junctionEl === from) return true;
+
+    return (this.reverse && this.next() === from) ||
+      (!this.reverse && this.prev() === from);
   }
 
   public junction(e: TrackElement): TrackElement {

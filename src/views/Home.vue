@@ -297,7 +297,6 @@ export default class Home extends Vue {
     rows[1][15] = rows[1][14].append(new Siding());
 
     this.rows = rows;
-    this.track = new Track(trackBegin);
   }
 
   moveTrains() {
