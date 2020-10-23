@@ -16,10 +16,11 @@ variables:
     - sclable
     - build-cluster
 
-.use-internal-cluster: &use-internal-cluster
+.use-internal-cluster: &use-demo-cluster
   tags:
     - sclable
-    - internal
+    - kubernetes-cluster
+    - project
 
 verify:
   stage: verify
@@ -74,7 +75,7 @@ build deployer:
       --destination ${IMAGE_DEPLOYER}:${CI_COMMIT_SHORT_SHA}
 
 deploy:
-  <<: *use-internal-cluster
+  <<: *use-demo-cluster
   stage: deploy
   only: [production]
   image: ${IMAGE_DEPLOYER}:latest
