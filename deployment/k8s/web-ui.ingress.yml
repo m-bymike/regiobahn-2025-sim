@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   annotations:
     # important, otherwise the gce ingress will pick it up, too
-    kubernetes.io/ingress.class: pay-slips-nginx
+    kubernetes.io/ingress.class: traefik
   name: web-ui
   namespace: oebb-sim
   labels:
