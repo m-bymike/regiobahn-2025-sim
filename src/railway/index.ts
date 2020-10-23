@@ -101,6 +101,7 @@ export abstract class TrackElement {
 
   abstract type(): TrackType;
 
+  // eslint-disable-next-line
   public stopInDir(next: boolean): boolean {
     return false;
   }
@@ -109,6 +110,7 @@ export abstract class TrackElement {
     return this.occupiedBy !== null;
   }
 
+  // eslint-disable-next-line
   public occupy(train: Train, from: TrackElement | null): void {
     if (this.isOccupied) {
       throw new Crash();

@@ -85,6 +85,14 @@
         </td>
       </tr>
     </table>
+
+    <p>&nbsp;</p>
+    <hr
+      style="border: 1px lightgray solid; width: 80vw; margin-bottom: 100px; margin-top: 100px"
+    />
+    <p>&nbsp;</p>
+
+    <Description />
   </div>
 </template>
 
@@ -165,6 +173,7 @@ table {
 </style>
 
 <script lang="ts">
+import Description from "@/components/Description.vue";
 import SwitchEl from "@/components/Switch.vue";
 import SignalEl from "@/components/Signal.vue";
 import {
@@ -179,7 +188,7 @@ import {
 import { Component, Vue } from "vue-property-decorator";
 
 @Component({
-  components: { SwitchEl, SignalEl }
+  components: { Description, SwitchEl, SignalEl }
 })
 export default class Home extends Vue {
   trackType = TrackType;
