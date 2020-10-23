@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    # important, otherwise the gce ingress will pick it up, too
+    kubernetes.io/ingress.class: pay-slips-nginx
+  name: web-ui
+  namespace: oebb-sim
+  labels:
+    ingress: web-ui
+    project: oebb-sim
+    branch: production
+    namespace: oebb-sim
+spec:
+  rules:
+    - host: 'oebb-sim.sclable.cloud'
+      http:
+        paths:
+          - backend:
+              serviceName: web-ui
+              servicePort: http
+            path: /

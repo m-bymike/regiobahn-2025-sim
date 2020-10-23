@@ -1,0 +1,110 @@
+stages:
+  - verify
+  - build
+  - deploy
+
+variables:
+  NPM_CONFIG_CACHE: "${CI_PROJECT_DIR}/.npm_cache"
+  K8S_NAMESPACE: sclable-pay-slips
+  GCR_BASE: eu.gcr.io
+  GCR_PROJECT: devops-155313
+  IMAGE_DEPLOYER: ${GCR_BASE}/${GCR_PROJECT}/${CI_PROJECT_PATH}/deployer
+  IMAGE_WEB_UI: ${GCR_BASE}/${GCR_PROJECT}/${CI_PROJECT_PATH}/web-ui
+
+.use-build-cluster: &use-build-cluster
+  tags:
+    - sclable
+    - build-cluster
+
+.use-internal-cluster: &use-internal-cluster
+  tags:
+    - sclable
+    - internal
+
+verify:
+  stage: verify
+  image: node:lts-alpine
+  cache:
+    key: verify job
+    paths: ["${NPM_CONFIG_CACHE}"]
+  before_script:
+    - npm ci
+  script:
+    - npm run lint
+
+.kaniko-build: &kaniko-build
+  <<: *use-build-cluster
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+
+build:
+  <<: *kaniko-build
+  stage: build
+  only: [production]
+  dependencies: []
+  script:
+    - /kaniko/executor
+      --context .
+      --dockerfile Dockerfile
+      --cache=true
+      --build-arg="SCLABLE_NPM_TOKEN=${SCLABLE_NPM_TOKEN}"
+      --build-arg="VUE_APP_BASE_URL=${VUE_APP_BASE_URL}"
+      --build-arg="VUE_APP_API_BASE_URL=${VUE_APP_API_BASE_URL}"
+      --build-arg="VUE_APP_CLIENT_ID=${VUE_APP_CLIENT_ID}"
+      --destination ${IMAGE_WEB_UI}:production
+      --destination ${IMAGE_WEB_UI}:production-${CI_COMMIT_SHORT_SHA}
+
+build deployer:
+  <<: *kaniko-build
+  stage: build
+  dependencies: []
+  only:
+    changes:
+      - deployment/build/Deployer.dockerfile
+
+  script:
+    - /kaniko/executor
+      --context deployment/build
+      --dockerfile deployment/build/Deployer.dockerfile
+      --cache=true
+      --destination ${IMAGE_DEPLOYER}:latest
+      --destination ${IMAGE_DEPLOYER}:${CI_COMMIT_SHORT_SHA}
+
+deploy:
+  <<: *use-internal-cluster
+  stage: deploy
+  only: [production]
+  image: ${IMAGE_DEPLOYER}:latest
+  dependencies: []
+  artifacts:
+    when: on_failure
+    name: k8s
+    paths:
+      - k8s/
+
+  environment:
+    name: "production"
+    url: "https://pay-slips.sclable.cloud"
+
+  tags:
+    - sclable
+    - internal
+
+  before_script:
+    - mkdir k8s
+
+  script:
+    - |
+      for file in deployment/k8s/web-ui.*.yml
+      do
+        envsubst < $file > k8s/$(basename $file)
+      done
+    - kubectl apply -n ${K8S_NAMESPACE} -f k8s/
+    - |
+      kubectl wait \
+        --for=condition=Ready \
+        --timeout=360s \
+        -n ${K8S_NAMESPACE} \
+        -l branch=${CI_COMMIT_REF_SLUG},commit=${CI_COMMIT_SHA},app=web-ui \
+        pod

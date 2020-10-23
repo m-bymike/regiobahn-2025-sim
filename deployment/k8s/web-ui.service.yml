@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-ui
+  namespace: oebb-sim
+  labels:
+    app: web-ui
+    project: oebb-sim
+    branch: production
+    namespace: oebb-sim
+spec:
+  ports:
+    - port: 80
+      name: http
+      protocol: TCP
+  selector:
+    app: web-ui
+    project: oebb-sim
+    branch: production
+    namespace: oebb-sim

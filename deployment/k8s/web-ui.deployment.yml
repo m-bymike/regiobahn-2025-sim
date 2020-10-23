@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ui
+  namespace: oebb-sim
+  labels:
+    app: web-ui
+    project: oebb-sim
+    branch: production
+    namespace: oebb-sim
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-ui
+      project: oebb-sim
+      branch: production
+      namespace: oebb-sim
+
+  template:
+    metadata:
+      labels:
+        app: web-ui
+        project: oebb-sim
+        branch: production
+        namespace: oebb-sim
+        commit: ${CI_COMMIT_SHA}
+
+
+    spec:
+      containers:
+        ##########################################
+        ## NGINX                                ##
+        ##########################################
+        - image: ${IMAGE_WEB_UI}:production-${CI_COMMIT_SHORT_SHA}
+          imagePullPolicy: Always
+          name: nginx
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "125m"
+            limits:
+              memory: "64Mi"
+              cpu: "250m"
+
+          ports:
+            - containerPort: 80
+              protocol: TCP
+              name: http
+
+          readinessProbe:
+            tcpSocket:
+              port: http
