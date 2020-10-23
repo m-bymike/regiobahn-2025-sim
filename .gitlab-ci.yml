@@ -41,6 +41,7 @@ verify:
 build:
   <<: *kaniko-build
   stage: build
+  needs: []
   only: [production]
   dependencies: []
   script:
@@ -59,6 +60,7 @@ build deployer:
   <<: *kaniko-build
   stage: build
   dependencies: []
+  needs: []
   only:
     changes:
       - deployment/build/Deployer.dockerfile
@@ -77,6 +79,7 @@ deploy:
   only: [production]
   image: ${IMAGE_DEPLOYER}:latest
   dependencies: []
+  needs: [build]
   artifacts:
     when: on_failure
     name: k8s
