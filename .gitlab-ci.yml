@@ -5,7 +5,7 @@ stages:
 
 variables:
   NPM_CONFIG_CACHE: "${CI_PROJECT_DIR}/.npm_cache"
-  K8S_NAMESPACE: sclable-pay-slips
+  K8S_NAMESPACE: oebb-sim
   GCR_BASE: eu.gcr.io
   GCR_PROJECT: devops-155313
   IMAGE_DEPLOYER: ${GCR_BASE}/${GCR_PROJECT}/${CI_PROJECT_PATH}/deployer
@@ -85,7 +85,7 @@ deploy:
 
   environment:
     name: "production"
-    url: "https://pay-slips.sclable.cloud"
+    url: "https://oebb-sim.sclable.cloud"
 
   tags:
     - sclable
