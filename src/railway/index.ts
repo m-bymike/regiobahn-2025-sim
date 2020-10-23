@@ -70,17 +70,18 @@ export class Train {
   }
 }
 
-export class TrainWithCompanion extends Train{
+export class TrainWithCompanion extends Train {
   protected canMove(): boolean {
     // look two elements into direction
-    const el = this.forward ?
-      this.pos?.next()?.next() : this.pos?.prev()?.prev();
+    const el = this.forward
+      ? this.pos?.next()?.next()
+      : this.pos?.prev()?.prev();
 
     return !el || !el.isOccupied;
   }
 
   protected prepareMove() {
-    super.prepareMove()
+    super.prepareMove();
     const next = this.forward ? this.pos?.next() : this.pos?.prev();
     if (!next) return;
     if (!this.pos) return;
@@ -158,14 +159,14 @@ export class Straight extends TrackElement {
 
 export class StraightWithSignal extends Straight {
   get stop(): boolean {
-    return this._stop
+    return this._stop;
   }
   public stopInDir(next: boolean): boolean {
     return this.stop && this.reverse !== next;
   }
 
   public change(): void {
-    this._stop = !this._stop
+    this._stop = !this._stop;
   }
 
   freeUp() {
@@ -174,9 +175,7 @@ export class StraightWithSignal extends Straight {
   }
 
   private _stop = true;
-  constructor(
-    public readonly reverse = false,
-  ) {
+  constructor(public readonly reverse = false) {
     super();
   }
 
@@ -230,7 +229,7 @@ export class Switch extends TrackElement {
       throw new SwitchNotReady();
     }
 
-    super.occupy(train, from)
+    super.occupy(train, from);
   }
 
   public isReady(from: TrackElement): boolean {
@@ -240,8 +239,10 @@ export class Switch extends TrackElement {
 
     if (this._junctionEl === from) return true;
 
-    return (this.reverse && this.next() === from) ||
-      (!this.reverse && this.prev() === from);
+    return (
+      (this.reverse && this.next() === from) ||
+      (!this.reverse && this.prev() === from)
+    );
   }
 
   public junction(e: TrackElement): TrackElement {

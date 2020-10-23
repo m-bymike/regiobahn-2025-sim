@@ -183,7 +183,7 @@ import { Component, Vue } from "vue-property-decorator";
 })
 export default class Home extends Vue {
   trackType = TrackType;
-  trains = [] as Train[];
+  trains = [] as TrainWithCompanion[];
   currentSpeed = 4;
   error: string | null = null;
   interval: number | null = null;
@@ -281,7 +281,7 @@ export default class Home extends Vue {
     rows[0][++col] = (rows[1][col - 1] as Switch | null | undefined)?.junction(
       new StraightWithSignal(true)
     );
-    rows[1][col] = rows[1][col - 1]?.append(new Straight(true));
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
     rows[0][++col] = rows[0][col - 1]?.append(new Straight());
     rows[1][col] = rows[1][col - 1]?.append(new Straight());
