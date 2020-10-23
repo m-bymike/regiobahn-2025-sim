@@ -93,7 +93,7 @@ export class TrainWithCompanion extends Train{
   }
 }
 
-abstract class TrackElement {
+export abstract class TrackElement {
   private n: TrackElement | null = null;
   private p: TrackElement | null = null;
   private occupiedBy: Train | null = null;

@@ -165,48 +165,30 @@ table {
 </style>
 
 <script lang="ts">
-import SwitchEl from '@/components/Switch.vue';
-import SignalEl from '@/components/Signal.vue';
+import SwitchEl from "@/components/Switch.vue";
+import SignalEl from "@/components/Signal.vue";
 import {
   Siding,
   Straight,
   StraightWithSignal,
   Switch,
-  Track,
+  TrackElement,
   TrackType,
   Train
 } from "@/railway";
 import { Component, Vue } from "vue-property-decorator";
-// import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 
 @Component({
   components: { SwitchEl, SignalEl }
 })
 export default class Home extends Vue {
   trackType = TrackType;
-  track: Track = null;
   trains = [] as Train[];
   currentSpeed = 4;
-  error: string = null;
-  interval = null;
-  rows = [];
+  error: string | null = null;
+  interval: number | null = null;
+  rows = [] as Array<Array<TrackElement | null | undefined>>;
 
-  // get rows() {
-  //   if (!this.track) return [];
-  //
-  //   let cur = this.track.trackBegin;
-  //   const rows = [[], []];
-  //   let curRow = 1;
-  //
-  //   do {
-  //     if ()
-  //     rows[curRow].push(cur);
-  //     cur = cur.next();
-  //   } while (cur);
-  //   ++curRow;
-  //
-  //   return rows;
-  // }
   get speed(): number {
     return this.currentSpeed;
   }
@@ -217,9 +199,8 @@ export default class Home extends Vue {
 
   reset() {
     this.error = null;
-    // this.error = "FOO BAR";
     this.trains = [];
-    this.track = this.buildTrack();
+    this.buildTrack();
     this.updateInterval(this.currentSpeed);
   }
 
@@ -242,8 +223,8 @@ export default class Home extends Vue {
     this.trains.push(train);
   }
 
-  buildTrack() {
-    const rows = [[], []];
+  buildTrack(): void {
+    const rows = [[], []] as Array<Array<TrackElement | null | undefined>>;
     const trackBegin = new Siding();
 
     let col = 0;
@@ -255,92 +236,98 @@ export default class Home extends Vue {
     rows[1][col] = trackBegin.append(new Straight());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal());
+    rows[1][col] = rows[1][col - 1]?.append(new StraightWithSignal());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(Switch.forwardNorth());
-    rows[1][col].switch();
+    rows[1][col] = rows[1][col - 1]?.append(Switch.forwardNorth());
+    (rows[1][col] as Switch).switch();
 
-    rows[0][++col] = rows[1][col - 1].junction(new StraightWithSignal(true));
-    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
+    rows[0][++col] = (rows[1][col - 1] as Switch | null | undefined)?.junction(
+      new StraightWithSignal(true)
+    );
+    rows[1][col] = rows[1][col - 1]?.append(new StraightWithSignal(true));
 
-    rows[0][++col] = rows[0][col - 1].append(new Straight());
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[0][++col] = rows[0][col - 1]?.append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
-    rows[0][++col] = rows[0][col - 1].append(new Straight());
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[0][++col] = rows[0][col - 1]?.append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
-    rows[0][++col] = rows[0][col - 1].append(new StraightWithSignal());
-    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal());
-
-    rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(Switch.reverseNorth());
-    rows[1][col].junction(rows[0][col - 1]);
+    rows[0][++col] = rows[0][col - 1]?.append(new StraightWithSignal());
+    rows[1][col] = rows[1][col - 1]?.append(new StraightWithSignal());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
+    rows[1][col] = rows[1][col - 1]?.append(Switch.reverseNorth());
+    (rows[1][col] as Switch).junction(rows[0][col - 1] as TrackElement);
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new StraightWithSignal(true));
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(Switch.forwardNorth());
-
-    rows[0][++col] = rows[1][col - 1].junction(new StraightWithSignal(true));
-    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
-
-    rows[0][++col] = rows[0][col - 1].append(new Straight());
-    rows[1][col] = rows[1][col - 1].append(new Straight());
-
-    rows[0][++col] = rows[0][col - 1].append(new Siding());
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal());
+    rows[1][col] = rows[1][col - 1]?.append(Switch.forwardNorth());
+
+    rows[0][++col] = (rows[1][col - 1] as Switch | null | undefined)?.junction(
+      new StraightWithSignal(true)
+    );
+    rows[1][col] = rows[1][col - 1]?.append(new StraightWithSignal(true));
+
+    rows[0][++col] = rows[0][col - 1]?.append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
+
+    rows[0][++col] = rows[0][col - 1]?.append(new Siding());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(Switch.forwardNorth());
-    rows[1][col].switch();
-
-    rows[0][++col] = rows[1][col - 1].junction(new StraightWithSignal(true));
-    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
-
-    rows[0][++col] = rows[0][col - 1].append(new Straight());
-    rows[1][col] = rows[1][col - 1].append(new Straight());
-
-    rows[0][++col] = rows[0][col - 1].append(new Straight());
-    rows[1][col] = rows[1][col - 1].append(new Straight());
-
-    rows[0][++col] = rows[0][col - 1].append(new StraightWithSignal());
-    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal());
+    rows[1][col] = rows[1][col - 1]?.append(new StraightWithSignal());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(Switch.reverseNorth());
-    rows[1][col].junction(rows[0][col - 1]);
+    rows[1][col] = rows[1][col - 1]?.append(Switch.forwardNorth());
+    (rows[1][col] as Switch).switch();
+
+    rows[0][++col] = (rows[1][col - 1] as Switch | null | undefined)?.junction(
+      new StraightWithSignal(true)
+    );
+    rows[1][col] = rows[1][col - 1]?.append(new StraightWithSignal(true));
+
+    rows[0][++col] = rows[0][col - 1]?.append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
+
+    rows[0][++col] = rows[0][col - 1]?.append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
+
+    rows[0][++col] = rows[0][col - 1]?.append(new StraightWithSignal());
+    rows[1][col] = rows[1][col - 1]?.append(new StraightWithSignal());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new StraightWithSignal(true));
+    rows[1][col] = rows[1][col - 1]?.append(Switch.reverseNorth());
+    (rows[1][col] as Switch).junction(rows[0][col - 1] as TrackElement);
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new StraightWithSignal(true));
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new Straight());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
 
     rows[0][++col] = null;
-    rows[1][col] = rows[1][col - 1].append(new Siding());
+    rows[1][col] = rows[1][col - 1]?.append(new Straight());
+
+    rows[0][++col] = null;
+    rows[1][col] = rows[1][col - 1]?.append(new Siding());
 
     this.rows = rows;
   }
