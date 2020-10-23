@@ -270,7 +270,3 @@ export class Switch extends TrackElement {
     return TrackType.Switch;
   }
 }
-
-export class Track {
-  constructor(public readonly trackBegin: TrackElement) {}
-}
