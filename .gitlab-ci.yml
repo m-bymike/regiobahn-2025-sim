@@ -16,7 +16,7 @@ variables:
     - sclable
     - build-cluster
 
-.use-internal-cluster: &use-demo-cluster
+.use-demo-cluster: &use-demo-cluster
   tags:
     - sclable
     - kubernetes-cluster
@@ -90,10 +90,6 @@ deploy:
   environment:
     name: "production"
     url: "https://oebb-sim.sclable.cloud"
-
-  tags:
-    - sclable
-    - internal
 
   before_script:
     - mkdir k8s
