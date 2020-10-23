@@ -3,7 +3,7 @@ FROM node:14.5-alpine AS build
 
 WORKDIR /usr/src/pay-slips-ui
 
-COPY package*.json .npmrc ./
+COPY package*.json ./
 
 ARG SCLABLE_NPM_TOKEN
 RUN npm ci
@@ -14,7 +14,7 @@ ARG VUE_APP_CLIENT_ID
 
 COPY public ./public
 COPY src ./src
-COPY .browserslistrc .eslintrc.js babel.config.js tsconfig.json vue.config.js ./
+COPY .browserslistrc .eslintrc.js babel.config.js tsconfig.json ./
 
 RUN npm run build -- --mode=production
 
